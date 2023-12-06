@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "75346613988",
+    "project_id": "t-market-139f7",
+    "storage_bucket": "t-market-139f7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:75346613988:android:f8810e499498a9ecba7ef1",
+        "android_client_info": {
+          "package_name": "com.example.firebase_3TMarket"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqHWk1og0oueCmL2BJZQTTVu2C-P5TDok"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
