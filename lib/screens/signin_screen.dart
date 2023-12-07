@@ -1,21 +1,21 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:my_project/screens/home_screen.dart';
+import 'package:my_project/screens/user_data_model.dart';
 import 'package:my_project/utils/colors_utils.dart';
 import 'package:my_project/reusable_widgets/reusable_widget.dart';
 import 'package:my_project/screens/signup_screen.dart';
-
 class SignInScreen extends StatefulWidget {
   const SignInScreen({Key? key}) : super(key: key);
-
   @override
   _SignInScreenState createState() => _SignInScreenState();
 }
-
 class _SignInScreenState extends State<SignInScreen> {
   TextEditingController _passwordTextController = TextEditingController();
   TextEditingController _emailTextController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,23 +59,19 @@ class _SignInScreenState extends State<SignInScreen> {
                 firebaseUIButton(context, "Sign In", () {
                   String email = _emailTextController.text.trim();
                   String password = _passwordTextController.text.trim();
-
                   if (email.isEmpty || password.isEmpty) {
                     // Handle case: Missing Email or Password
                     showAlertDialog(context, "Missing Credentials",
                         "Please enter both email and password.");
                     return;
                   }
-
                   FirebaseAuth.instance
                       .signInWithEmailAndPassword(
                           email: email, password: password)
                       .then((value) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()),
-                    );
-}).catchError((error) {
+                    String uid = value.user!.uid;
+                    fetchUserData(context,uid,email);
+                  }).catchError((error) {
                     // Handle other error cases
                     String errorMessage =
                         "Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản và mật khẩu.";
@@ -105,6 +101,53 @@ class _SignInScreenState extends State<SignInScreen> {
       ),
     );
   }
+  void fetchUserData(BuildContext context, String uid,String email) async {
+  DatabaseReference userReference = FirebaseDatabase.instance.ref()
+    .child('Accounts')
+    .child(uid);
+
+  try {
+    userReference.onValue.listen((event) {
+      var dataSnapshot = event.snapshot;
+      if (dataSnapshot.value != null) {
+        var userData = dataSnapshot.value as Map<dynamic, dynamic>;
+
+        String name = userData['Name'] ?? '';
+        String address = userData['Address'] ?? '';
+        String phoneNumber = userData['PhoneNumber'] ?? ''; // Thêm số điện thoại
+
+        UserData userDataModel = UserData(
+          uid: uid,
+          email: email,
+          name: name,
+          address: address,
+          phoneNumber: phoneNumber, // Thêm số điện thoại
+        );
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(userData: userDataModel),
+          ),
+        );
+      } else {
+        showAlertDialog(
+          context,
+          "User not found",
+          "User data not available.",
+        );
+      }
+    });
+  } catch (error) {
+    print("Fetch data error: $error");
+    showAlertDialog(
+      context,
+      "Fetch Data Error",
+      "An error occurred while fetching user data.",
+    );
+  }
+}
+
 
   Row signUpOption() {
     return Row(
@@ -126,7 +169,6 @@ class _SignInScreenState extends State<SignInScreen> {
       ],
     );
   }
-
   showAlertDialog(BuildContext context, String title, String content) {
     showDialog(
       context: context,
