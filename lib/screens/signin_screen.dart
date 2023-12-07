@@ -47,12 +47,12 @@ class _SignInScreenState extends State<SignInScreen> {
                   height: 30,
                 ),
                 reusableTextField(
-                    "Enter Username After", Icons.person_outline, false, _emailTextController),
+                    "Enter Username", Icons.person_outline, false, _emailTextController),
                 const SizedBox(
                   height: 30,
                 ),
                 reusableTextField(
-                    "Enter Password After", Icons.lock_outline, true, _passwordTextController),
+                    "Enter Password", Icons.lock_outline, true, _passwordTextController),
                 const SizedBox(
                   height: 20,
                 ),
